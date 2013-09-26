@@ -188,25 +188,8 @@ int levenshtein5(char *s1, char *s2) {
         #pragma omp parallel for firstprivate(iend, istart, s1, s2) shared(current, prev_p, prev2_p) num_threads(4)
         for (int i = istart; i <= iend; i++){
             int j = k - i;
-			//printf("(Row, Col): (%d, %d) \n", i, j);
 			current_p[i] = MIN3(prev_p[i] + 1, prev_p[i - 1] + 1, prev2_p[i - 1] + (s1[j - 1] == s2[i - 1] ? 0 : 1));
-			//printf("Current is min of following choices: (%d, %d, %d)\n", prev_p[i] + 1, prev_p[i - 1] + 1, prev2_p[i - 1] + (s1[j - 1] == s2[i - 1] ? 0 : 1));
-			//printf("Element in Row %d is %d \n", i, current_p[i]);
-        }
-
-	    /*printf("Size of prev2, prev, and current : %d, %d, %d \n", prev2_size, prev_size, current_size);
-		printf("Prev2 starts from Row %d and ends at Row %d \n", prev2_start, prev2_end);
-		for(int i = prev2_start; i <= prev2_end; i++)
-			printf("Row %d is %d \n\n", i, prev2_p[i]);
-
-		printf("Prev starts from Row %d and ends at Row %d \n", prev_start, prev_end);
-		for(int i = prev_start; i <= prev_end; i++)
-            printf("Row %d is %d \n\n", i, prev_p[i]);
-
-        printf("Current starts from Row %d and ends at Row %d \n", current_start, current_end);
-        for(int i = current_start; i <= current_end; i++)
-            printf("Row %d is %d \n\n", i, current_p[i]);*/
-	
+        }	
 	
 		temp = prev2_p;
 
@@ -258,22 +241,7 @@ int parallel_levenshtein_2(char *s1, char *s2){
         	current_p[k] = k;
         	current_p[0] = k;
         }
-		
-
-		/*#pragma omp parallel num_threads(2) firstprivate(iend, istart, s1, s2, local_curr, prev_p, prev2_p) shared(current_p)
-		{
-			int id = omp_get_thread_num();
-			int nthrds = omp_get_num_threads();
-			int count = 0;
-			for(int i = istart + id; i <= iend; i = i + nthrds){
-				int j = k - i;
-				local_curr[count] = MIN3(prev_p[i] + 1, prev_p[i - 1] + 1, prev2_p[i - 1] + (s1[j - 1] == s2[i - 1] ? 0 : 1));
-				count++;
-			}
-			for(int i = 0; i < count; i++)
-				current_p[istart + id + i*nthrds] = local_curr[i];
-		}*/
-				
+						
        	#pragma omp parallel for firstprivate(iend, istart, s1, s2, prev_p, prev2_p) shared(current_p) num_threads(16)
         for (int i = istart; i <= iend; i++){
 			int j = k - i;
